@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -10,11 +10,11 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { AuthInput } from '../../components/AuthInput/AuthInput';
-import { AddPhotoBtn } from '../../components/AddPhotoBtn/AddPhotoBtn';
 
 const schema = yup
   .object({
@@ -34,6 +34,7 @@ export default function RegisterScreen() {
     resolver: yupResolver(schema),
   });
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const navigation = useNavigation();
 
   const onShowPassword = () => {
     setIsPasswordVisible(state => !state);
@@ -47,6 +48,10 @@ export default function RegisterScreen() {
     hideKeyboard();
     console.log(data);
     reset(initialFormState);
+  };
+
+  const goToRegisterPage = () => {
+    navigation.navigate('Register');
   };
 
   return (
@@ -96,10 +101,7 @@ export default function RegisterScreen() {
                 <Text style={styles.btnTitle}>Увійти</Text>
               </TouchableOpacity>
             </View>
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={() => console.log('Нажали на кнопку Зарегистрироваться ', Date.now())}
-            >
+            <TouchableOpacity activeOpacity={0.8} onPress={goToRegisterPage}>
               <Text style={styles.signUpText}>
                 Немає акаунту? <Text style={styles.registerText}>Зареєструватися</Text>
               </Text>

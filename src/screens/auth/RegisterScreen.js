@@ -10,6 +10,7 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
@@ -36,6 +37,7 @@ export default function RegisterScreen() {
     resolver: yupResolver(schema),
   });
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const navigation = useNavigation();
 
   const onShowPassword = () => {
     setIsPasswordVisible(state => !state);
@@ -49,6 +51,10 @@ export default function RegisterScreen() {
     hideKeyboard();
     console.log(data);
     reset(initialFormState);
+  };
+
+  const goToLoginPage = () => {
+    navigation.navigate('Login');
   };
 
   return (
@@ -102,10 +108,7 @@ export default function RegisterScreen() {
                 <Text style={styles.btnTitle}>Зареєстуватися</Text>
               </TouchableOpacity>
             </View>
-            <TouchableOpacity
-              activeOpacity={0.8}
-              onPress={() => console.log('Нажали на кнопку Войти ', Date.now())}
-            >
+            <TouchableOpacity activeOpacity={0.8} onPress={goToLoginPage}>
               <Text style={styles.logInText}>Вже є акаунт? Увійти</Text>
             </TouchableOpacity>
           </View>
