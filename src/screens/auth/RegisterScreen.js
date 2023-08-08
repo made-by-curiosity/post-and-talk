@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import {
   StyleSheet,
   Text,
@@ -31,92 +31,86 @@ const initialFormState = {
 };
 
 export default function RegisterScreen() {
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm({
+  const { control, reset, handleSubmit } = useForm({
     defaultValues: initialFormState,
     resolver: yupResolver(schema),
   });
-  const [isKeyboardActive, setIsKeyboardActive] = useState(false);
+  const [isPasswordVisible, setIsPasswordVisible] = useState(false);
 
-  console.log(errors);
-
-  useEffect(() => {
-    console.log(`isKeyboardActive ${Date.now()}`, isKeyboardActive);
-  }, [isKeyboardActive]);
-
-  useEffect(() => {
-    if (isKeyboardActive) {
-    }
-    setIsKeyboardActive(false);
-  }, [Keyboard]);
+  const onShowPassword = () => {
+    setIsPasswordVisible(state => !state);
+  };
 
   const hideKeyboard = () => {
     Keyboard.dismiss();
-    setIsKeyboardActive(false);
   };
 
   const onSignUp = data => {
     hideKeyboard();
     console.log(data);
+    reset(initialFormState);
   };
 
   return (
     <TouchableWithoutFeedback onPress={hideKeyboard}>
-      <View style={styles.container}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? -180 : -200}
+      >
         <ImageBackground style={styles.bgcImg} source={require('../../assets/img/main-bg.jpg')}>
-          <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-            <View style={styles.authWrapper}>
-              <View style={styles.photoBox}>
-                <AddPhotoBtn />
-              </View>
-              <View style={styles.header}>
-                <Text style={styles.headerTitle}>Реєстрація</Text>
-              </View>
-              <View
-                style={{
-                  ...styles.form,
-                }}
-              >
-                <View style={styles.inputsContainer}>
-                  <AuthInput
-                    control={control}
-                    fieldName="login"
-                    placeholder="Логін"
-                    onFocus={() => setIsKeyboardActive(true)}
-                  />
-                  <AuthInput
-                    control={control}
-                    fieldName="email"
-                    placeholder="Адреса електронної пошти"
-                    onFocus={() => setIsKeyboardActive(true)}
-                  />
-                  <AuthInput
-                    control={control}
-                    fieldName="password"
-                    placeholder="Пароль"
-                    onFocus={() => setIsKeyboardActive(true)}
-                    secureTextEntry
-                  />
-                </View>
-
+          <View style={styles.authWrapper}>
+            <View style={styles.photoBox}>
+              <AddPhotoBtn />
+            </View>
+            <View style={styles.header}>
+              <Text style={styles.headerTitle}>Реєстрація</Text>
+            </View>
+            <View
+              style={{
+                ...styles.form,
+              }}
+            >
+              <View style={styles.inputsContainer}>
+                <AuthInput control={control} fieldName="login" placeholder="Логін" />
+                <AuthInput
+                  control={control}
+                  fieldName="email"
+                  placeholder="Адреса електронної пошти"
+                  type="email-address"
+                />
+                <AuthInput
+                  control={control}
+                  fieldName="password"
+                  placeholder="Пароль"
+                  secureTextEntry={!isPasswordVisible}
+                />
                 <TouchableOpacity
-                  style={styles.button}
+                  onPress={onShowPassword}
                   activeOpacity={0.8}
-                  onPress={handleSubmit(onSignUp)}
+                  style={styles.pswdBtn}
                 >
-                  <Text style={styles.btnTitle}>Зареєстуватися</Text>
+                  <Text style={styles.pswdShow}>{isPasswordVisible ? 'Сховати' : 'Показати'}</Text>
                 </TouchableOpacity>
               </View>
-              <View>
-                <Text style={{ color: 'black', textAlign: 'center' }}>Вже є акаунт? Увійти</Text>
-              </View>
+
+              <TouchableOpacity
+                style={styles.button}
+                activeOpacity={0.8}
+                onPress={handleSubmit(onSignUp)}
+              >
+                <Text style={styles.btnTitle}>Зареєстуватися</Text>
+              </TouchableOpacity>
             </View>
-          </KeyboardAvoidingView>
+            <TouchableOpacity
+              activeOpacity={0.8}
+              onPress={() => console.log('Нажали на кнопку Войти ', Date.now())}
+            >
+              <Text style={styles.logInText}>Вже є акаунт? Увійти</Text>
+            </TouchableOpacity>
+          </View>
         </ImageBackground>
-      </View>
+      </KeyboardAvoidingView>
     </TouchableWithoutFeedback>
   );
 }
@@ -124,11 +118,8 @@ export default function RegisterScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#aaa',
   },
   bgcImg: {
-    position: 'relative',
-
     flex: 1,
     resizeMode: 'cover',
     justifyContent: 'flex-end',
@@ -172,15 +163,25 @@ const styles = StyleSheet.create({
     marginBottom: 33,
   },
   inputsContainer: {
-    display: 'flex',
+    position: 'relative',
     flexDirection: 'column',
     gap: 16,
-    marginBottom: 43,
+    marginBottom: 27,
   },
   inputTitle: {
     color: '#f0f8ff',
     marginBottom: 10,
     fontSize: 18,
+  },
+  pswdBtn: {
+    position: 'absolute',
+    bottom: 30,
+    right: 16,
+  },
+  pswdShow: {
+    color: '#1B4371',
+    fontFamily: 'Roboto-Regular',
+    fontSize: 16,
   },
   button: {
     paddingVertical: 16,
@@ -194,5 +195,11 @@ const styles = StyleSheet.create({
     fontFamily: 'Roboto-Regular',
     fontSize: 16,
     color: '#FFFFFF',
+  },
+  logInText: {
+    color: '#1B4371',
+    fontFamily: 'Roboto-Regular',
+    fontSize: 16,
+    textAlign: 'center',
   },
 });

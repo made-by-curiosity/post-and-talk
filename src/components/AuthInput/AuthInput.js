@@ -1,20 +1,21 @@
 import { View, TextInput, StyleSheet, Text } from 'react-native';
+import { useState } from 'react';
 import { Controller } from 'react-hook-form';
 
 export const AuthInput = ({
   control,
   fieldName,
   placeholder,
-  onFocus,
   secureTextEntry,
-  rules = {},
+  type = 'default',
 }) => {
+  const [isFocused, setIsFocused] = useState(false);
+
   return (
     <Controller
       control={control}
       name={fieldName}
-      rules={rules}
-      render={({ field: { value, onChange, onBlur }, fieldState: { error } }) => (
+      render={({ field: { value, onChange }, fieldState: { error } }) => (
         <View>
           {error && <Text style={styles.errorMessage}>{error.message}</Text>}
 
@@ -22,18 +23,19 @@ export const AuthInput = ({
             style={[
               styles.container,
               {
-                borderColor: error ? 'red' : '#E8E8E8',
+                borderColor: isFocused ? '#FF6C00' : error ? 'red' : '#E8E8E8',
               },
             ]}
           >
             <TextInput
               style={styles.textInput}
-              onFocus={onFocus}
+              onFocus={() => setIsFocused(true)}
               placeholder={placeholder}
               onChangeText={onChange}
-              onBlur={onBlur}
+              onBlur={() => setIsFocused(false)}
               value={value}
               secureTextEntry={secureTextEntry}
+              keyboardType={type}
             />
           </View>
         </View>
@@ -52,6 +54,8 @@ const styles = StyleSheet.create({
     backgroundColor: '#F6F6F6',
   },
   textInput: {
+    color: '#212121',
+    fontSize: 16,
     padding: 16,
     paddingBottom: 15,
     height: '100%',

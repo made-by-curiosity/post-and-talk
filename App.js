@@ -17,8 +17,8 @@ export default function App() {
 
   return (
     <>
-      {/* <LoginScreen /> */}
-      <RegisterScreen />
+      <LoginScreen />
+      {/* <RegisterScreen /> */}
     </>
   );
 }
