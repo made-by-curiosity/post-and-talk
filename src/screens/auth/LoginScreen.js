@@ -54,7 +54,7 @@ export default function RegisterScreen() {
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        keyboardVerticalOffset={Platform.OS === 'ios' ? -80 : -220}
+        keyboardVerticalOffset={Platform.OS === 'ios' ? -270 : -220}
       >
         <ImageBackground style={styles.bgcImg} source={require('../../assets/img/main-bg.jpg')}>
           <View style={styles.authWrapper}>
