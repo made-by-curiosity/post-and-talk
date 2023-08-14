@@ -1,10 +1,9 @@
 import 'react-native-gesture-handler';
-import { NavigationContainer } from '@react-navigation/native';
-
 import { useFonts } from 'expo-font';
-import { useRoute } from './src/router';
+import { Navigation } from './src/Navigation';
+import { UserProvider } from './src/hooks/userContext';
 
-export default function App({ navigation }) {
+export default function App() {
   const [fontsLoaded] = useFonts({
     'Roboto-Bold': require('./src/assets/fonts/Roboto/Roboto-Bold.ttf'),
     'Roboto-Medium': require('./src/assets/fonts/Roboto/Roboto-Medium.ttf'),
@@ -12,11 +11,13 @@ export default function App({ navigation }) {
     'Inter-Medium': require('./src/assets/fonts/Inter/static/Inter-Medium.ttf'),
   });
 
-  const routing = useRoute(true, navigation);
-
   if (!fontsLoaded) {
     return null;
   }
 
-  return <NavigationContainer>{routing}</NavigationContainer>;
+  return (
+    <UserProvider>
+      <Navigation />
+    </UserProvider>
+  );
 }

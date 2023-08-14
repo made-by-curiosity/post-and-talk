@@ -1,9 +1,13 @@
 import { TouchableOpacity, View, StyleSheet } from 'react-native';
 import { Feather } from '@expo/vector-icons';
+import { useUser } from '../../hooks/userContext';
 
 export const LogoutBtn = () => {
+  const { logOut } = useUser();
+
   const onLogout = () => {
     console.log('Нажали на выход ', Date.now());
+    logOut();
   };
 
   return (

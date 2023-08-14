@@ -15,6 +15,7 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { AuthInput } from '../../components/AuthInput/AuthInput';
+import { useUser } from '../../hooks/userContext';
 
 const schema = yup
   .object({
@@ -35,6 +36,7 @@ export default function RegisterScreen() {
   });
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const navigation = useNavigation();
+  const { logIn } = useUser();
 
   const onShowPassword = () => {
     setIsPasswordVisible(state => !state);
@@ -44,9 +46,9 @@ export default function RegisterScreen() {
     Keyboard.dismiss();
   };
 
-  const onSignUp = data => {
-    hideKeyboard();
+  const onLogIn = data => {
     console.log(data);
+    logIn();
     reset(initialFormState);
   };
 
@@ -96,13 +98,13 @@ export default function RegisterScreen() {
               <TouchableOpacity
                 style={styles.button}
                 activeOpacity={0.8}
-                onPress={handleSubmit(onSignUp)}
+                onPress={handleSubmit(onLogIn)}
               >
                 <Text style={styles.btnTitle}>Увійти</Text>
               </TouchableOpacity>
             </View>
             <TouchableOpacity activeOpacity={0.8} onPress={goToRegisterPage}>
-              <Text style={styles.signUpText}>
+              <Text style={styles.logInText}>
                 Немає акаунту? <Text style={styles.registerText}>Зареєструватися</Text>
               </Text>
             </TouchableOpacity>
@@ -180,7 +182,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#FFFFFF',
   },
-  signUpText: {
+  logInText: {
     color: '#1B4371',
     fontFamily: 'Roboto-Regular',
     fontSize: 16,

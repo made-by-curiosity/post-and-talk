@@ -18,8 +18,6 @@ export default function CreatePostsScreen() {
 
   const isReadyToPost = !!photoName && !!photoLocation;
 
-  console.log(isReadyToPost);
-
   const onTakePhoto = () => {
     console.log('делаем фото ', Date.now());
   };
