@@ -7,6 +7,8 @@ import MainScreen from './screens/bottomNav/MainScreen';
 import CreatePostsScreen from './screens/main/CreatePostScreen';
 
 import { useUser } from './hooks/userContext';
+import { CommentsScreen } from './screens/main/CommentsScreen';
+import { MapScreen } from './screens/main/MapScreen';
 
 const AuthStack = createStackNavigator();
 const MainStack = createStackNavigator();
@@ -37,6 +39,34 @@ export const Navigation = () => {
           component={CreatePostsScreen}
           options={{
             title: 'Створити публікацію',
+            headerTitleAlign: 'center',
+            headerTitleStyle: {
+              lineHeight: 22,
+              fontSize: 17,
+              letterSpacing: -0.4,
+              fontFamily: 'Roboto-Medium',
+            },
+          }}
+        />
+        <MainStack.Screen
+          name="Comments"
+          component={CommentsScreen}
+          options={{
+            title: 'Коментарі',
+            headerTitleAlign: 'center',
+            headerTitleStyle: {
+              lineHeight: 22,
+              fontSize: 17,
+              letterSpacing: -0.4,
+              fontFamily: 'Roboto-Medium',
+            },
+          }}
+        />
+        <MainStack.Screen
+          name="Map"
+          component={MapScreen}
+          options={{
+            title: 'Мапа',
             headerTitleAlign: 'center',
             headerTitleStyle: {
               lineHeight: 22,

@@ -1,7 +1,10 @@
-import { View, Text, StyleSheet, Image } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import girlAvatar from '../../assets/img/girl-avatar.jpg';
+import { useNavigation } from '@react-navigation/native';
 
 export default function PostsScreen() {
+  const navigation = useNavigation();
+
   return (
     <View style={styles.container}>
       <View style={styles.userWrapper}>
@@ -10,6 +13,14 @@ export default function PostsScreen() {
           <Text style={styles.name}>Natali Romanova</Text>
           <Text style={styles.email}>email@example.com</Text>
         </View>
+      </View>
+      <View>
+        <TouchableOpacity onPress={() => navigation.navigate('Map')}>
+          <Text>Map</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Comments')}>
+          <Text>Comments</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -23,6 +34,7 @@ const styles = StyleSheet.create({
     paddingTop: 32,
   },
   userWrapper: {
+    marginBottom: 32,
     flexDirection: 'row',
     alignItems: 'center',
     gap: 8,
