@@ -4,7 +4,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
 import { useRoute } from './src/router';
 
-export default function App() {
+export default function App({ navigation }) {
   const [fontsLoaded] = useFonts({
     'Roboto-Bold': require('./src/assets/fonts/Roboto/Roboto-Bold.ttf'),
     'Roboto-Medium': require('./src/assets/fonts/Roboto/Roboto-Medium.ttf'),
@@ -12,7 +12,7 @@ export default function App() {
     'Inter-Medium': require('./src/assets/fonts/Inter/static/Inter-Medium.ttf'),
   });
 
-  const routing = useRoute(true);
+  const routing = useRoute(true, navigation);
 
   if (!fontsLoaded) {
     return null;
