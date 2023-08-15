@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Text,
   View,
@@ -8,18 +8,36 @@ import {
   TouchableWithoutFeedback,
   Keyboard,
   KeyboardAvoidingView,
+  Image,
 } from 'react-native';
+import { Camera, CameraType } from 'expo-camera';
+import * as MediaLibrary from 'expo-media-library';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
 
 export default function CreatePostsScreen() {
   const [photoName, setPhotoName] = useState('');
   const [photoLocation, setPhotoLocation] = useState('');
+  const [permission, requestPermission] = Camera.useCameraPermissions();
+  const [type, setType] = useState(CameraType.back);
+  const [photo, setPhoto] = useState('');
+  const [cameraRef, setCameraRef] = useState(null);
 
-  const isReadyToPost = !!photoName && !!photoLocation;
+  useEffect(() => {
+    (async () => {
+      await requestPermission();
+      console.log(permission);
+    })();
+  }, []);
 
-  const onTakePhoto = () => {
+  useEffect(() => {
+    console.log('photo', photo);
+  }, [photo]);
+
+  const onTakePhoto = async () => {
     console.log('делаем фото ', Date.now());
+    const picture = await cameraRef.takePictureAsync();
+    setPhoto(picture.uri);
   };
 
   const onPost = () => {
@@ -29,11 +47,18 @@ export default function CreatePostsScreen() {
     console.log('публикуем фото ', Date.now());
   };
 
+  const resetPhoto = () => {
+    setPhoto('');
+  };
+
   const onDelete = () => {
     console.log('удаляем фото ', Date.now());
     setPhotoName('');
     setPhotoLocation('');
+    setPhoto('');
   };
+
+  const isReadyToPost = !!photoName && !!photoLocation && !!photo;
 
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
@@ -43,11 +68,30 @@ export default function CreatePostsScreen() {
         keyboardVerticalOffset={Platform.OS === 'ios' ? -270 : -220}
       >
         <View style={styles.photoBox}>
-          <TouchableOpacity style={styles.photoBtn} activeOpacity={0.8} onPress={onTakePhoto}>
-            <MaterialIcons name="photo-camera" size={24} color="#BDBDBD" />
-          </TouchableOpacity>
+          {!photo ? (
+            <Camera style={styles.camera} type={type} ref={setCameraRef} />
+          ) : (
+            <View style={styles.photoContainer}>
+              <Image source={{ uri: photo }} style={{ flex: 1 }} />
+            </View>
+          )}
+
+          <View style={styles.photoBtnContainer}>
+            <TouchableOpacity
+              style={[
+                styles.photoBtn,
+                { backgroundColor: !photo ? '#fff' : 'rgba(255, 255, 255, 0.30)' },
+              ]}
+              activeOpacity={0.8}
+              onPress={!photo ? onTakePhoto : resetPhoto}
+            >
+              <MaterialIcons name="photo-camera" size={24} color={!photo ? '#BDBDBD' : '#fff'} />
+            </TouchableOpacity>
+          </View>
         </View>
-        <Text style={styles.mainText}>Завантажте фото</Text>
+
+        <Text style={styles.mainText}>{!photo ? 'Завантажте фото' : 'Редагувати фото'}</Text>
+
         <TextInput
           style={styles.photoName}
           placeholder="Назва..."
@@ -95,19 +139,37 @@ const styles = StyleSheet.create({
     height: 240,
     marginBottom: 8,
 
-    justifyContent: 'center',
-    alignItems: 'center',
-
     borderWidth: 1,
     borderRadius: 8,
     borderColor: '#E8E8E8',
 
     backgroundColor: '#F6F6F6',
+    overflow: 'hidden',
+
+    position: 'relative',
+  },
+  camera: {
+    flex: 1,
+  },
+  photoContainer: {
+    flex: 1,
+  },
+  photoBtnContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+
+    justifyContent: 'center',
+    alignItems: 'center',
+
+    flex: 1,
   },
   photoBtn: {
     width: 60,
     height: 60,
-    backgroundColor: '#fff',
+
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 50,
