@@ -104,6 +104,7 @@ export default function MainScreen() {
             height: 40,
             alignSelf: 'center',
           },
+          headerShown: false,
         }}
       />
     </Tab.Navigator>

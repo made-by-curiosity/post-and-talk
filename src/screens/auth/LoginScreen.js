@@ -143,7 +143,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   headerTitle: {
-    fontFamily: 'Roboto-Bold',
+    fontFamily: 'Roboto-Medium',
     fontSize: 30,
     color: '#212121',
     marginBottom: 33,
