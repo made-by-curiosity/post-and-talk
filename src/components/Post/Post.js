@@ -12,7 +12,7 @@ export const Post = ({ item }) => {
         <TouchableOpacity onPress={() => navigation.navigate('Comments')}>
           <Text>Comments</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Map')}>
+        <TouchableOpacity onPress={() => navigation.navigate('Map', item)}>
           <Text>{item.location}</Text>
         </TouchableOpacity>
       </View>

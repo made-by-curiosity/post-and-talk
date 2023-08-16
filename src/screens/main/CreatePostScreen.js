@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Camera, CameraType } from 'expo-camera';
+import * as Location from 'expo-location';
 import * as MediaLibrary from 'expo-media-library';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
@@ -24,13 +25,28 @@ export default function CreatePostsScreen() {
   const [photo, setPhoto] = useState('');
   const [photoName, setPhotoName] = useState('');
   const [photoLocation, setPhotoLocation] = useState('');
+  const [location, setLocation] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
   const { savePhotoInfo } = useUser();
   const navigation = useNavigation();
 
   useEffect(() => {
     (async () => {
       await requestPermission();
-      console.log(permission);
+      console.log('camera permission ', permission);
+    })();
+
+    (async () => {
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      console.log('location permission ', status);
+
+      if (status !== 'granted') {
+        setErrorMsg('Permission to access location was denied');
+        return;
+      }
+
+      let location = await Location.getCurrentPositionAsync({});
+      setLocation(location.coords);
     })();
   }, []);
 
@@ -51,6 +67,7 @@ export default function CreatePostsScreen() {
       path: photo,
       name: photoName,
       location: photoLocation,
+      coords: location,
     };
 
     savePhotoInfo(photoInfo);
@@ -79,7 +96,7 @@ export default function CreatePostsScreen() {
       >
         <View style={styles.photoBox}>
           {!photo ? (
-            <Camera style={styles.camera} type={type} ref={setCameraRef} />
+            <Camera style={styles.camera} type={type} ref={setCameraRef} ratio="3:4" />
           ) : (
             <View style={styles.photoContainer}>
               <Image source={{ uri: photo }} style={{ flex: 1 }} />
