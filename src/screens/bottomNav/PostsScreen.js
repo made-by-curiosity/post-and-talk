@@ -1,9 +1,11 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native';
 import girlAvatar from '../../assets/img/girl-avatar.jpg';
 import { useNavigation } from '@react-navigation/native';
+import { useUser } from '../../hooks/userContext';
+import { Post } from '../../components/Post/Post';
 
 export default function PostsScreen() {
-  const navigation = useNavigation();
+  const { photoList } = useUser();
 
   return (
     <View style={styles.container}>
@@ -14,14 +16,11 @@ export default function PostsScreen() {
           <Text style={styles.email}>email@example.com</Text>
         </View>
       </View>
-      <View>
-        <TouchableOpacity onPress={() => navigation.navigate('Map')}>
-          <Text>Map</Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('Comments')}>
-          <Text>Comments</Text>
-        </TouchableOpacity>
-      </View>
+      <FlatList
+        data={photoList}
+        keyExtractor={post => post.id.toString()}
+        renderItem={({ item }) => <Post item={item} />}
+      />
     </View>
   );
 }

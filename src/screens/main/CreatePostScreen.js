@@ -10,18 +10,22 @@ import {
   KeyboardAvoidingView,
   Image,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { Camera, CameraType } from 'expo-camera';
 import * as MediaLibrary from 'expo-media-library';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
+import { useUser } from '../../hooks/userContext';
 
 export default function CreatePostsScreen() {
-  const [photoName, setPhotoName] = useState('');
-  const [photoLocation, setPhotoLocation] = useState('');
   const [permission, requestPermission] = Camera.useCameraPermissions();
+  const [cameraRef, setCameraRef] = useState(null);
   const [type, setType] = useState(CameraType.back);
   const [photo, setPhoto] = useState('');
-  const [cameraRef, setCameraRef] = useState(null);
+  const [photoName, setPhotoName] = useState('');
+  const [photoLocation, setPhotoLocation] = useState('');
+  const { savePhotoInfo } = useUser();
+  const navigation = useNavigation();
 
   useEffect(() => {
     (async () => {
@@ -30,14 +34,11 @@ export default function CreatePostsScreen() {
     })();
   }, []);
 
-  useEffect(() => {
-    console.log('photo', photo);
-  }, [photo]);
-
   const onTakePhoto = async () => {
     console.log('делаем фото ', Date.now());
     const picture = await cameraRef.takePictureAsync();
     setPhoto(picture.uri);
+    console.log(picture);
   };
 
   const onPost = () => {
@@ -45,6 +46,15 @@ export default function CreatePostsScreen() {
       return;
     }
     console.log('публикуем фото ', Date.now());
+
+    const photoInfo = {
+      path: photo,
+      name: photoName,
+      location: photoLocation,
+    };
+
+    savePhotoInfo(photoInfo);
+    navigation.navigate('Posts');
   };
 
   const resetPhoto = () => {
