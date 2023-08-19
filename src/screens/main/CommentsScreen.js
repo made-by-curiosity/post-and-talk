@@ -7,10 +7,9 @@ import {
   Keyboard,
   TouchableWithoutFeedback,
   KeyboardAvoidingView,
-  // FlatList,
 } from 'react-native';
 import { AntDesign } from '@expo/vector-icons';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
 import { collection, setDoc, doc, onSnapshot, query, orderBy } from 'firebase/firestore';
 import { db } from '../../firebase/config';
@@ -24,13 +23,6 @@ export const CommentsScreen = ({ route }) => {
   const [comment, setComment] = useState('');
   const currentUserId = useSelector(selectUserId);
   const { login } = useSelector(selectUser);
-
-  useEffect(() => {
-    if (allComments.length < 1) {
-      return;
-    }
-    console.log(allComments);
-  }, [allComments]);
 
   useEffect(() => {
     getAllComments();
@@ -63,6 +55,18 @@ export const CommentsScreen = ({ route }) => {
     }
   };
 
+  const scrollToBottom = () => {
+    if (commentsListRef.current && !!allComments.length) {
+      commentsListRef.current.scrollToEnd({ animated: false });
+    }
+  };
+
+  const commentsListRef = useRef(null);
+
+  const handleContentSizeChange = () => {
+    scrollToBottom();
+  };
+
   return (
     <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
       <KeyboardAvoidingView
@@ -74,6 +78,8 @@ export const CommentsScreen = ({ route }) => {
           <Image style={styles.photo} source={{ uri: photoUrl }} />
         </View>
         <FlatList
+          ref={commentsListRef}
+          onContentSizeChange={handleContentSizeChange}
           style={styles.commentsContainer}
           data={allComments}
           keyExtractor={comment => comment.id.toString()}
@@ -146,6 +152,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   commentsContainer: {
+    flexGrow: 1,
     backgroundColor: 'tomato',
   },
 
