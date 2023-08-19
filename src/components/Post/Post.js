@@ -33,9 +33,17 @@ export const Post = ({ item }) => {
         >
           <View style={styles.commentsContainer}>
             <View style={styles.iconWrapper}>
-              <Feather name="message-circle" size={24} color="#BDBDBD" />
+              <Feather
+                name="message-circle"
+                size={24}
+                color={!!commentsCount ? '#FF6C00' : '#BDBDBD'}
+              />
             </View>
-            <Text style={styles.commentsCount}>{commentsCount}</Text>
+            <Text
+              style={[styles.commentsCount, { color: !!commentsCount ? '#212121' : '#bdbdbd' }]}
+            >
+              {commentsCount}
+            </Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('Map', item)}>
@@ -68,7 +76,6 @@ const styles = StyleSheet.create({
   },
   commentsCount: {
     fontSize: 16,
-    color: '#BDBDBD',
   },
   commentsContainer: {
     flexDirection: 'row',
