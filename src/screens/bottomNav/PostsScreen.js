@@ -4,16 +4,25 @@ import girlAvatar from '../../assets/img/girl-avatar.jpg';
 import { Post } from '../../components/Post/Post';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../redux/auth/selectors';
-import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
+import { collection, getDocs, onSnapshot, orderBy, query } from 'firebase/firestore';
 import { db } from '../../firebase/config';
 
 export default function PostsScreen() {
   const [posts, setPosts] = useState([]);
+  const [postsWithComments, setPostsWithComments] = useState([]);
   const user = useSelector(selectUser);
 
   useEffect(() => {
     getAllPosts();
   }, []);
+
+  useEffect(() => {
+    getCommentsCountForPosts();
+  }, [posts]);
+
+  // useEffect(() => {
+  //   console.log(postsWithComments);
+  // }, [postsWithComments]);
 
   const getAllPosts = async () => {
     try {
@@ -28,6 +37,27 @@ export default function PostsScreen() {
     }
   };
 
+  const getCommentsCountForPosts = async () => {
+    const postsToRender = await Promise.all(
+      posts.map(async post => {
+        const commentsRef = query(collection(db, `posts/${post.id}/comments`));
+
+        const comments = await getDocs(commentsRef);
+
+        const commentsCount = comments.docs.map(doc => doc.data()).length;
+
+        const postWithComment = {
+          ...post,
+          commentsCount,
+        };
+
+        return postWithComment;
+      })
+    );
+
+    setPostsWithComments(postsToRender);
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.userWrapper}>
@@ -38,7 +68,7 @@ export default function PostsScreen() {
         </View>
       </View>
       <FlatList
-        data={posts}
+        data={postsWithComments}
         keyExtractor={post => post.id.toString()}
         renderItem={({ item }) => <Post item={item} />}
       />

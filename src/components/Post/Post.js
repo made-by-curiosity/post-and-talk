@@ -19,7 +19,7 @@ export const Post = ({ item }) => {
             <View style={styles.iconWrapper}>
               <Feather name="message-circle" size={24} color="#BDBDBD" />
             </View>
-            <Text style={styles.commentsCount}>0</Text>
+            <Text style={styles.commentsCount}>{item.commentsCount}</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('Map', item)}>
