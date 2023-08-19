@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useSelector } from 'react-redux';
 import {
   Text,
   View,
@@ -13,10 +14,12 @@ import {
 import { useNavigation } from '@react-navigation/native';
 import { Camera, CameraType } from 'expo-camera';
 import * as Location from 'expo-location';
-import * as MediaLibrary from 'expo-media-library';
 import { MaterialIcons } from '@expo/vector-icons';
 import { Feather } from '@expo/vector-icons';
-import { useUser } from '../../hooks/userContext';
+import { getDownloadURL, ref, uploadBytes } from 'firebase/storage';
+import { collection, addDoc } from 'firebase/firestore';
+import { storage, db } from '../../firebase/config';
+import { selectUser, selectUserId } from '../../redux/auth/selectors';
 
 export default function CreatePostsScreen() {
   const [permission, requestPermission] = Camera.useCameraPermissions();
@@ -27,18 +30,17 @@ export default function CreatePostsScreen() {
   const [photoLocation, setPhotoLocation] = useState('');
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
-  const { savePhotoInfo } = useUser();
   const navigation = useNavigation();
+  const { login } = useSelector(selectUser);
+  const userId = useSelector(selectUserId);
 
   useEffect(() => {
     (async () => {
       await requestPermission();
-      console.log('camera permission ', permission);
     })();
 
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
-      console.log('location permission ', status);
 
       if (status !== 'granted') {
         setErrorMsg('Permission to access location was denied');
@@ -51,27 +53,73 @@ export default function CreatePostsScreen() {
   }, []);
 
   const onTakePhoto = async () => {
-    console.log('делаем фото ', Date.now());
     const picture = await cameraRef.takePictureAsync();
     setPhoto(picture.uri);
-    console.log(picture);
   };
 
-  const onPost = () => {
+  const onPost = async () => {
     if (!isReadyToPost) {
       return;
     }
-    console.log('публикуем фото ', Date.now());
+
+    const path = await uploadPhotoToServer();
 
     const photoInfo = {
-      path: photo,
+      path,
       name: photoName,
       location: photoLocation,
       coords: location,
+      login,
+      userId,
+      date: Date.now(),
     };
 
-    savePhotoInfo(photoInfo);
+    console.log(photoInfo);
+
+    await writePostToFirestore(photoInfo);
+
     navigation.navigate('Posts');
+  };
+
+  const writePostToFirestore = async photoInfo => {
+    try {
+      await addDoc(collection(db, 'posts'), photoInfo);
+    } catch (e) {
+      console.error('Error adding document: ', e);
+      throw e;
+    }
+  };
+
+  const uploadPhotoToServer = async () => {
+    const blob = await uriToBlob(photo);
+
+    const uniquePostId = Date.now();
+
+    const photoRef = ref(storage, `postImages/${uniquePostId}`);
+
+    await uploadBytes(photoRef, blob);
+
+    return await getDownloadURL(photoRef);
+  };
+
+  const uriToBlob = uri => {
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        // return the blob
+        resolve(xhr.response);
+      };
+
+      xhr.onerror = function () {
+        // something went wrong
+        reject(new Error('uriToBlob failed'));
+      };
+      // this helps us get a blob
+      xhr.responseType = 'blob';
+      xhr.open('GET', uri, true);
+
+      xhr.send(null);
+    });
   };
 
   const resetPhoto = () => {

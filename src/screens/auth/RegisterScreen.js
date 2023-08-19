@@ -16,7 +16,8 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
 import { AuthInput } from '../../components/AuthInput/AuthInput';
 import { AddPhotoBtn } from '../../components/AddPhotoBtn/AddPhotoBtn';
-import { useUser } from '../../hooks/userContext';
+import { useDispatch } from 'react-redux';
+import { signUp } from '../../redux/auth/operations';
 
 const schema = yup
   .object({
@@ -39,7 +40,8 @@ export default function RegisterScreen() {
   });
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
   const navigation = useNavigation();
-  const { logIn } = useUser();
+
+  const dispatch = useDispatch();
 
   const onShowPassword = () => {
     setIsPasswordVisible(state => !state);
@@ -52,7 +54,7 @@ export default function RegisterScreen() {
   const onSignUp = data => {
     hideKeyboard();
     console.log(data);
-    logIn();
+    dispatch(signUp(data));
     reset(initialFormState);
   };
 

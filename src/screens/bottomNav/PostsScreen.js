@@ -1,23 +1,44 @@
-import { View, Text, StyleSheet, Image, TouchableOpacity, FlatList } from 'react-native';
+import { useEffect, useState } from 'react';
+import { View, Text, StyleSheet, Image, FlatList } from 'react-native';
 import girlAvatar from '../../assets/img/girl-avatar.jpg';
-import { useNavigation } from '@react-navigation/native';
-import { useUser } from '../../hooks/userContext';
 import { Post } from '../../components/Post/Post';
+import { useSelector } from 'react-redux';
+import { selectUser } from '../../redux/auth/selectors';
+import { collection, onSnapshot, orderBy, query } from 'firebase/firestore';
+import { db } from '../../firebase/config';
 
 export default function PostsScreen() {
-  const { photoList } = useUser();
+  const [posts, setPosts] = useState([]);
+  const user = useSelector(selectUser);
+
+  useEffect(() => {
+    getAllPosts();
+  }, []);
+
+  const getAllPosts = async () => {
+    try {
+      const dateDesc = query(collection(db, 'posts'), orderBy('date', 'desc'));
+
+      onSnapshot(dateDesc, data => {
+        setPosts(data.docs.map(doc => ({ ...doc.data(), id: doc.id })));
+      });
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  };
 
   return (
     <View style={styles.container}>
       <View style={styles.userWrapper}>
         <Image source={girlAvatar} style={styles.avatarImg} />
         <View>
-          <Text style={styles.name}>Natali Romanova</Text>
-          <Text style={styles.email}>email@example.com</Text>
+          <Text style={styles.name}>{user.login}</Text>
+          <Text style={styles.email}>{user.email}</Text>
         </View>
       </View>
       <FlatList
-        data={photoList}
+        data={posts}
         keyExtractor={post => post.id.toString()}
         renderItem={({ item }) => <Post item={item} />}
       />

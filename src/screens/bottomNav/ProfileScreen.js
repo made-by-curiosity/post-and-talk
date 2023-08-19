@@ -1,12 +1,38 @@
-import { StyleSheet, Text, View, ImageBackground } from 'react-native';
-import { useNavigation } from '@react-navigation/native';
-import { useUser } from '../../hooks/userContext';
+import { useEffect, useState } from 'react';
+import { StyleSheet, Text, View, ImageBackground, FlatList } from 'react-native';
 import { AddPhotoBtn } from '../../components/AddPhotoBtn/AddPhotoBtn';
 import { LogoutBtn } from '../../components/LogoutBtn/LogoutBtn';
+import { useSelector } from 'react-redux';
+import { selectUser, selectUserId } from '../../redux/auth/selectors';
+import { Post } from '../../components/Post/Post';
+import { collection, onSnapshot, orderBy, query, where } from 'firebase/firestore';
+import { db } from '../../firebase/config';
 
 export default function ProfileScreen() {
-  const navigation = useNavigation();
-  const { logIn } = useUser();
+  const [posts, setPosts] = useState([]);
+  const user = useSelector(selectUser);
+  const userId = useSelector(selectUserId);
+
+  useEffect(() => {
+    getAllPosts();
+  }, []);
+
+  const getAllPosts = async () => {
+    try {
+      const dateDesc = query(
+        collection(db, 'posts'),
+        where('userId', '==', userId),
+        orderBy('date', 'desc')
+      );
+
+      onSnapshot(dateDesc, data => {
+        setPosts(data.docs.map(doc => ({ ...doc.data(), id: doc.id })));
+      });
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  };
 
   return (
     <View style={styles.container}>
@@ -19,13 +45,15 @@ export default function ProfileScreen() {
             <AddPhotoBtn />
           </View>
           <View style={styles.header}>
-            <Text style={styles.headerTitle}>Natali Romanova</Text>
+            <Text style={styles.headerTitle}>{user.login}</Text>
           </View>
-          <View
-            style={{
-              ...styles.form,
-            }}
-          ></View>
+          <View style={styles.postsContainer}>
+            <FlatList
+              data={posts}
+              keyExtractor={post => post.id.toString()}
+              renderItem={({ item }) => <Post item={item} />}
+            />
+          </View>
         </View>
       </ImageBackground>
     </View>
@@ -42,9 +70,9 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
   },
   authWrapper: {
-    minHeight: 550,
+    height: 600,
     paddingTop: 60,
-    paddingBottom: 45,
+    paddingBottom: 100,
     position: 'relative',
 
     backgroundColor: 'white',
@@ -83,5 +111,8 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 22,
     right: 0,
+  },
+  postsContainer: {
+    marginHorizontal: 16,
   },
 });

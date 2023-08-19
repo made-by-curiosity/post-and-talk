@@ -6,15 +6,16 @@ import RegisterScreen from './screens/auth/RegisterScreen';
 import MainScreen from './screens/bottomNav/MainScreen';
 import CreatePostsScreen from './screens/main/CreatePostScreen';
 
-import { useUser } from './hooks/userContext';
 import { CommentsScreen } from './screens/main/CommentsScreen';
 import { MapScreen } from './screens/main/MapScreen';
+import { useSelector } from 'react-redux';
+import { selectStateChange } from './redux/auth/selectors';
 
 const AuthStack = createStackNavigator();
 const MainStack = createStackNavigator();
 
 export const Navigation = () => {
-  const { isLoggedIn } = useUser();
+  const isLoggedIn = useSelector(selectStateChange);
 
   if (!isLoggedIn) {
     return (

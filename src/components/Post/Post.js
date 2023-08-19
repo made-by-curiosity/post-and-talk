@@ -12,7 +12,9 @@ export const Post = ({ item }) => {
         <Text style={styles.name}>{item.name}</Text>
       </View>
       <View style={styles.buttons}>
-        <TouchableOpacity onPress={() => navigation.navigate('Comments')}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate('Comments', { postId: item.id, photoUrl: item.path })}
+        >
           <View style={styles.commentsContainer}>
             <View style={styles.iconWrapper}>
               <Feather name="message-circle" size={24} color="#BDBDBD" />
