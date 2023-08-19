@@ -11,7 +11,15 @@ import {
 import { AntDesign } from '@expo/vector-icons';
 import { useEffect, useRef, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { collection, setDoc, doc, onSnapshot, query, orderBy } from 'firebase/firestore';
+import {
+  collection,
+  setDoc,
+  doc,
+  onSnapshot,
+  query,
+  orderBy,
+  collectionGroup,
+} from 'firebase/firestore';
 import { db } from '../../firebase/config';
 import { selectUserId, selectUser } from '../../redux/auth/selectors';
 import { Image } from 'react-native';
@@ -77,39 +85,69 @@ export const CommentsScreen = ({ route }) => {
         <View style={styles.photoBox}>
           <Image style={styles.photo} source={{ uri: photoUrl }} />
         </View>
-        <FlatList
-          ref={commentsListRef}
-          onContentSizeChange={handleContentSizeChange}
-          style={styles.commentsContainer}
-          data={allComments}
-          keyExtractor={comment => comment.id.toString()}
-          renderItem={({ item }) => {
-            const date = new Date(item.date);
-            const options = {
-              day: 'numeric',
-              month: 'long',
-              year: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit',
-            };
-            const sentTime = date.toLocaleString('uk-UA', options);
+        {!allComments.length ? (
+          <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
+            <Text>Нема коментарів</Text>
+          </View>
+        ) : (
+          <FlatList
+            ref={commentsListRef}
+            onContentSizeChange={handleContentSizeChange}
+            style={styles.commentsContainer}
+            data={allComments}
+            keyExtractor={comment => comment.id.toString()}
+            renderItem={({ item }) => {
+              const date = new Date(item.date);
+              const options = {
+                day: 'numeric',
+                month: 'long',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit',
+              };
+              const sentTime = date.toLocaleString('uk-UA', options).replace('р.,', '|');
 
-            const isCurrentUsersComment = item.userId === currentUserId;
+              const isCurrentUsersComment = item.userId === currentUserId;
 
-            return (
-              <View
-                style={[
-                  styles.comment,
-                  { alignSelf: isCurrentUsersComment ? 'flex-start' : 'flex-end' },
-                ]}
-              >
-                <Text>{item.login}</Text>
-                <Text>{item.comment}</Text>
-                <Text>{sentTime}</Text>
-              </View>
-            );
-          }}
-        />
+              return (
+                <View
+                  style={[
+                    styles.commentWrapper,
+                    {
+                      flexDirection: isCurrentUsersComment ? 'row-reverse' : 'row',
+                      gap: 16,
+                    },
+                  ]}
+                >
+                  <View>
+                    <Text>{item.login}</Text>
+                  </View>
+                  <View
+                    style={[
+                      styles.comment,
+                      {
+                        borderTopRightRadius: isCurrentUsersComment ? 0 : 6,
+                        borderTopLeftRadius: isCurrentUsersComment ? 6 : 0,
+                      },
+                    ]}
+                  >
+                    <Text style={styles.message}>{item.comment}</Text>
+                    <Text
+                      style={[
+                        styles.messageTime,
+                        {
+                          alignSelf: isCurrentUsersComment ? 'flex-start' : 'flex-end',
+                        },
+                      ]}
+                    >
+                      {sentTime}
+                    </Text>
+                  </View>
+                </View>
+              );
+            }}
+          />
+        )}
         <View style={styles.inputContainer}>
           <TextInput
             placeholder="Коментувати..."
@@ -153,15 +191,32 @@ const styles = StyleSheet.create({
   },
   commentsContainer: {
     flexGrow: 1,
-    backgroundColor: 'tomato',
   },
-
+  commentWrapper: {
+    flexDirection: 'row',
+  },
   comment: {
-    backgroundColor: 'gray',
-    marginBottom: 10,
+    backgroundColor: 'rgba(0, 0, 0, 0.03)',
+    marginBottom: 24,
+    padding: 16,
+    flex: 1,
+
+    borderRadius: 6,
+  },
+  message: {
+    fontSize: 13,
+    lineHeight: 18,
+    fontFamily: 'Roboto-Regular',
+    color: '#212121',
+    marginBottom: 8,
+  },
+  messageTime: {
+    fontFamily: 'Roboto-Regular',
+    fontSize: 10,
+    color: '#BDBDBD',
   },
   inputContainer: {
-    marginTop: 31,
+    marginTop: 7,
   },
   sendBtn: {
     width: 34,

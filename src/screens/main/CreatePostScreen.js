@@ -74,8 +74,6 @@ export default function CreatePostsScreen() {
       date: Date.now(),
     };
 
-    console.log(photoInfo);
-
     await writePostToFirestore(photoInfo);
 
     navigation.navigate('Posts');

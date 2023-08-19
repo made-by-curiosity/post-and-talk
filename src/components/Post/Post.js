@@ -1,9 +1,25 @@
 import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { Feather } from '@expo/vector-icons';
+import { useEffect, useState } from 'react';
+import { collection, onSnapshot, query } from 'firebase/firestore';
+import { db } from '../../firebase/config';
 
 export const Post = ({ item }) => {
   const navigation = useNavigation();
+  const [commentsCount, setCommentsCount] = useState(0);
+
+  useEffect(() => {
+    getCommentsCount();
+  }, []);
+
+  const getCommentsCount = async () => {
+    const commentsRef = query(collection(db, `posts/${item.id}/comments`));
+
+    onSnapshot(commentsRef, data => {
+      setCommentsCount(data.docs.map(doc => doc.data()).length);
+    });
+  };
 
   return (
     <View style={styles.post}>
@@ -19,7 +35,7 @@ export const Post = ({ item }) => {
             <View style={styles.iconWrapper}>
               <Feather name="message-circle" size={24} color="#BDBDBD" />
             </View>
-            <Text style={styles.commentsCount}>{item.commentsCount}</Text>
+            <Text style={styles.commentsCount}>{commentsCount}</Text>
           </View>
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('Map', item)}>
