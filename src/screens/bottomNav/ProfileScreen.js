@@ -7,14 +7,23 @@ import { selectUser, selectUserId } from '../../redux/auth/selectors';
 import { Post } from '../../components/Post/Post';
 import { collection, onSnapshot, orderBy, query, where } from 'firebase/firestore';
 import { db } from '../../firebase/config';
+import { Image } from 'react-native';
+import { DeletePhotoBtn } from '../../components/DeletePhotoBtn/DeletePhotoBtn';
 
 export default function ProfileScreen() {
-  const [posts, setPosts] = useState([]);
   const user = useSelector(selectUser);
   const userId = useSelector(selectUserId);
+  const [userAvatar, setUserAvatar] = useState(null);
+  const [posts, setPosts] = useState([]);
 
   useEffect(() => {
     getAllPosts();
+  }, []);
+
+  useEffect(() => {
+    if (user.avatar) {
+      setUserAvatar(user.avatar);
+    }
   }, []);
 
   const getAllPosts = async () => {
@@ -34,6 +43,12 @@ export default function ProfileScreen() {
     }
   };
 
+  const avatarHandler = avatarInfo => {
+    setUserAvatar(avatarInfo);
+  };
+
+  const avatarDeleteHandler = result => {};
+
   return (
     <View style={styles.container}>
       <ImageBackground style={styles.bgcImg} source={require('../../assets/img/main-bg.jpg')}>
@@ -42,7 +57,13 @@ export default function ProfileScreen() {
             <LogoutBtn />
           </View>
           <View style={styles.photoBox}>
-            <AddPhotoBtn />
+            {userAvatar && <Image source={{ uri: userAvatar }} style={styles.avatar} />}
+
+            {userAvatar ? (
+              <DeletePhotoBtn avatarDeleteHandler={avatarDeleteHandler} />
+            ) : (
+              <AddPhotoBtn avatarHandler={avatarHandler} />
+            )}
           </View>
           <View style={styles.header}>
             <Text style={styles.headerTitle}>{user.login}</Text>
@@ -94,6 +115,8 @@ const styles = StyleSheet.create({
 
     borderRadius: 16,
   },
+  avatar: { flex: 1, borderRadius: 16, resizeMode: 'cover' },
+
   form: {
     marginHorizontal: 16,
   },

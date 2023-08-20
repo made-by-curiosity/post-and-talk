@@ -7,13 +7,13 @@ import {
 import { auth } from '../../firebase/config';
 
 export const signUp = createAsyncThunk('auth/signUp', async (credentials, thunkAPI) => {
-  const { email, password, login } = credentials;
+  const { email, password, login, avatar } = credentials;
   try {
     await createUserWithEmailAndPassword(auth, email, password);
 
     const currentUser = auth.currentUser;
     if (currentUser) {
-      await updateProfile(currentUser, { displayName: login });
+      await updateProfile(currentUser, { displayName: login, photoURL: avatar });
     }
 
     return {
@@ -21,6 +21,7 @@ export const signUp = createAsyncThunk('auth/signUp', async (credentials, thunkA
       user: {
         email: currentUser.email,
         login: currentUser.displayName,
+        avatar: currentUser.photoURL,
       },
     };
   } catch (error) {
@@ -38,6 +39,7 @@ export const logIn = createAsyncThunk('auth/logIn', async (credentials, thunkAPI
       user: {
         email: user.email,
         login: user.displayName,
+        avatar: user.photoURL,
       },
     };
   } catch (error) {
@@ -61,6 +63,7 @@ export const authStateChangeUser = createAsyncThunk('auth/stateChange', async (u
       user: {
         email: user?.email || null,
         login: user?.displayName || null,
+        avatar: user.photoURL || null,
       },
     };
   } catch (error) {

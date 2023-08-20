@@ -49,8 +49,6 @@ export default function RegisterScreen() {
   };
 
   const onLogIn = data => {
-    console.log(data);
-    // logIn();
     dispatch(logIn(data));
     reset(initialFormState);
   };

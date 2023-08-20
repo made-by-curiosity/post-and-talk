@@ -18,6 +18,7 @@ import { AuthInput } from '../../components/AuthInput/AuthInput';
 import { AddPhotoBtn } from '../../components/AddPhotoBtn/AddPhotoBtn';
 import { useDispatch } from 'react-redux';
 import { signUp } from '../../redux/auth/operations';
+import { Image } from 'react-native';
 
 const schema = yup
   .object({
@@ -39,6 +40,7 @@ export default function RegisterScreen() {
     resolver: yupResolver(schema),
   });
   const [isPasswordVisible, setIsPasswordVisible] = useState(false);
+  const [avatar, setAvatar] = useState(null);
   const navigation = useNavigation();
 
   const dispatch = useDispatch();
@@ -52,10 +54,18 @@ export default function RegisterScreen() {
   };
 
   const onSignUp = data => {
-    hideKeyboard();
-    console.log(data);
-    dispatch(signUp(data));
+    const userRegisterInfo = {
+      ...data,
+      avatar,
+    };
+
+    dispatch(signUp(userRegisterInfo));
     reset(initialFormState);
+    hideKeyboard();
+  };
+
+  const avatarHandler = avatarInfo => {
+    setAvatar(avatarInfo);
   };
 
   const goToLoginPage = () => {
@@ -72,7 +82,8 @@ export default function RegisterScreen() {
         <ImageBackground style={styles.bgcImg} source={require('../../assets/img/main-bg.jpg')}>
           <View style={styles.authWrapper}>
             <View style={styles.photoBox}>
-              <AddPhotoBtn />
+              {avatar && <Image source={{ uri: avatar }} style={styles.avatar} />}
+              <AddPhotoBtn avatarHandler={avatarHandler} />
             </View>
             <View style={styles.header}>
               <Text style={styles.headerTitle}>Реєстрація</Text>
@@ -157,6 +168,7 @@ const styles = StyleSheet.create({
 
     borderRadius: 16,
   },
+  avatar: { flex: 1, borderRadius: 16, resizeMode: 'cover' },
   form: {
     marginHorizontal: 16,
   },

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Image, FlatList } from 'react-native';
-import girlAvatar from '../../assets/img/girl-avatar.jpg';
+import defaultAvatar from '../../assets/img/default-avatar.png';
 import { Post } from '../../components/Post/Post';
 import { useSelector } from 'react-redux';
 import { selectUser } from '../../redux/auth/selectors';
@@ -31,7 +31,11 @@ export default function PostsScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.userWrapper}>
-        <Image source={girlAvatar} style={styles.avatarImg} />
+        {user.avatar ? (
+          <Image source={{ uri: user.avatar }} style={styles.avatarImg} />
+        ) : (
+          <Image source={defaultAvatar} style={styles.avatarImg} />
+        )}
         <View>
           <Text style={styles.name}>{user.login}</Text>
           <Text style={styles.email}>{user.email}</Text>

@@ -24,13 +24,14 @@ import { db } from '../../firebase/config';
 import { selectUserId, selectUser } from '../../redux/auth/selectors';
 import { Image } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
+import defaultAvatar from '../../assets/img/default-avatar.png';
 
 export const CommentsScreen = ({ route }) => {
   const [allComments, setAllComments] = useState([]);
   const { postId, photoUrl } = route.params;
   const [comment, setComment] = useState('');
   const currentUserId = useSelector(selectUserId);
-  const { login } = useSelector(selectUser);
+  const { login, avatar } = useSelector(selectUser);
 
   useEffect(() => {
     getAllComments();
@@ -51,6 +52,7 @@ export const CommentsScreen = ({ route }) => {
         login,
         comment,
         date: Date.now(),
+        avatar,
       };
 
       const commentsRef = doc(collection(db, `posts/${postId}/comments`));
@@ -120,7 +122,10 @@ export const CommentsScreen = ({ route }) => {
                   ]}
                 >
                   <View>
-                    <Text>{item.login}</Text>
+                    <Image
+                      source={item.avatar ? { uri: item.avatar } : defaultAvatar}
+                      style={styles.avatar}
+                    />
                   </View>
                   <View
                     style={[
@@ -131,6 +136,7 @@ export const CommentsScreen = ({ route }) => {
                       },
                     ]}
                   >
+                    <Text style={styles.useName}>{item.login}</Text>
                     <Text style={styles.message}>{item.comment}</Text>
                     <Text
                       style={[
@@ -202,6 +208,17 @@ const styles = StyleSheet.create({
     flex: 1,
 
     borderRadius: 6,
+  },
+  avatar: {
+    width: 28,
+    height: 28,
+    borderRadius: 50,
+  },
+  useName: {
+    fontSize: 10,
+
+    fontWeight: '900',
+    marginBottom: 5,
   },
   message: {
     fontSize: 13,
