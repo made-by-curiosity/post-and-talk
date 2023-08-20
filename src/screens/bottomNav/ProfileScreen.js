@@ -2,19 +2,21 @@ import { useEffect, useState } from 'react';
 import { StyleSheet, Text, View, ImageBackground, FlatList } from 'react-native';
 import { AddPhotoBtn } from '../../components/AddPhotoBtn/AddPhotoBtn';
 import { LogoutBtn } from '../../components/LogoutBtn/LogoutBtn';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { selectUser, selectUserId } from '../../redux/auth/selectors';
 import { Post } from '../../components/Post/Post';
 import { collection, onSnapshot, orderBy, query, where } from 'firebase/firestore';
 import { db } from '../../firebase/config';
 import { Image } from 'react-native';
 import { DeletePhotoBtn } from '../../components/DeletePhotoBtn/DeletePhotoBtn';
+import { avatarDelete, avatarUpdate } from '../../redux/auth/operations';
 
 export default function ProfileScreen() {
   const user = useSelector(selectUser);
   const userId = useSelector(selectUserId);
   const [userAvatar, setUserAvatar] = useState(null);
   const [posts, setPosts] = useState([]);
+  const dispatch = useDispatch();
 
   useEffect(() => {
     getAllPosts();
@@ -43,11 +45,15 @@ export default function ProfileScreen() {
     }
   };
 
-  const avatarHandler = avatarInfo => {
-    setUserAvatar(avatarInfo);
+  const avatarHandler = photoLink => {
+    setUserAvatar(photoLink);
+    dispatch(avatarUpdate(photoLink));
   };
 
-  const avatarDeleteHandler = result => {};
+  const avatarDeleteHandler = () => {
+    dispatch(avatarDelete());
+    setUserAvatar(null);
+  };
 
   return (
     <View style={styles.container}>

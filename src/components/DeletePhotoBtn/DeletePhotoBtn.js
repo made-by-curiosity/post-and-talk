@@ -1,21 +1,22 @@
 import { TouchableOpacity, View, StyleSheet } from 'react-native';
+import { useSelector } from 'react-redux';
 import { AntDesign } from '@expo/vector-icons';
-
 import { ref, deleteObject } from 'firebase/storage';
 import { storage } from '../../firebase/config';
+import { selectUser } from '../../redux/auth/selectors';
 
 export const DeletePhotoBtn = ({ avatarDeleteHandler }) => {
+  const user = useSelector(selectUser);
+
   const onDeletePhoto = async () => {
-    console.log('Нажали на удалить фото ', Date.now());
+    await deletePhotoFromFirestore();
 
-    const result = await deletePhotoFromFirestore();
-
-    avatarDeleteHandler(result);
+    avatarDeleteHandler();
   };
 
   const deletePhotoFromFirestore = async () => {
     try {
-      const avatarRef = ref(storage, 'avatarImages/desert.jpg');
+      const avatarRef = ref(storage, user.avatar);
 
       await deleteObject(avatarRef);
     } catch (error) {}

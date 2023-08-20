@@ -70,3 +70,27 @@ export const authStateChangeUser = createAsyncThunk('auth/stateChange', async (u
     return thunkAPI.rejectWithValue(error.message);
   }
 });
+
+export const avatarDelete = createAsyncThunk('auth/avatarDelete', async (_, thunkAPI) => {
+  try {
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      await updateProfile(currentUser, { photoURL: '' });
+    }
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error.message);
+  }
+});
+
+export const avatarUpdate = createAsyncThunk('auth/avatarUpdate', async (photoLink, thunkAPI) => {
+  try {
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      await updateProfile(currentUser, { photoURL: photoLink });
+    }
+
+    return photoLink;
+  } catch (error) {
+    return thunkAPI.rejectWithValue(error.message);
+  }
+});

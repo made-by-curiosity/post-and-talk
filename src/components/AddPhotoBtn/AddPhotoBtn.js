@@ -7,8 +7,6 @@ import { storage } from '../../firebase/config';
 
 export const AddPhotoBtn = ({ avatarHandler }) => {
   const onAddPhoto = async () => {
-    console.log('Нажали на добавить фото ', Date.now());
-
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!(status === 'granted')) {
       Alert.alert('Дозвіл не надано', 'Додайте дозвіл для використання фото в налаштуваннях');
@@ -20,9 +18,9 @@ export const AddPhotoBtn = ({ avatarHandler }) => {
     });
 
     if (!result.canceled) {
-      const avatarInfo = await uploadPhotoToServer(result.assets[0].uri);
+      const avatar = await uploadPhotoToServer(result.assets[0].uri);
 
-      avatarHandler(avatarInfo);
+      avatarHandler(avatar);
     }
   };
 

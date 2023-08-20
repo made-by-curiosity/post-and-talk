@@ -1,5 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { logIn, logOut, signUp, authStateChangeUser } from './operations';
+import {
+  logIn,
+  logOut,
+  signUp,
+  authStateChangeUser,
+  avatarDelete,
+  avatarUpdate,
+} from './operations';
 
 const initialState = {
   user: { login: null, email: null, avatar: null },
@@ -42,6 +49,12 @@ const authSlice = createSlice({
       state.user = { login: null, email: null, avatar: null };
       state.userId = null;
       state.stateChange = null;
+    });
+    builder.addCase(avatarDelete.fulfilled, state => {
+      state.user.avatar = null;
+    });
+    builder.addCase(avatarUpdate.fulfilled, (state, action) => {
+      state.user.avatar = action.payload;
     });
   },
 });

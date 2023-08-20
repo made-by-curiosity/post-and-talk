@@ -125,7 +125,6 @@ export default function CreatePostsScreen() {
   };
 
   const onDelete = () => {
-    console.log('удаляем фото ', Date.now());
     setPhotoName('');
     setPhotoLocation('');
     setPhoto('');
